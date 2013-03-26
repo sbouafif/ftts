@@ -3,5 +3,6 @@ extends layout
 block content
   h1= title
   form(method='post', action='/search')
+    //input(type="hidden", name="_csrf", value="#{csrftoken}")
     input(name='search', id='search', placeholder='artist / song')
   section(id='res')

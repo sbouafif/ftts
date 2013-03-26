@@ -6,10 +6,15 @@ var express = require('express')
   , routes = require('./routes')
   , http = require('http')
   , path = require('path')
-  , fs = require('fs');
+  , fs = require('fs')
+  , helmet = require('helmet')
+  , stylus = require('stylus')
+  , nib = require('nib');
 
 var app = express();
 var server = http.createServer(app);
+
+
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -18,18 +23,40 @@ app.configure(function(){
   app.use(express.favicon());
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
+  app.use(helmet.xframe());
+  app.use(helmet.iexss());
+  app.use(helmet.contentTypeOptions());
+  app.use(helmet.cacheControl());
   app.use(express.methodOverride());
-  app.use(app.router);
+  app.use(express.cookieParser());
   app.use(express.static(path.join(__dirname, 'public')));
+  app.use(express.session({
+    secret: "notagoodsecretnoreallydontusethisone",
+    cookie: {httpOnly: true, secure: true}
+  }));
+//  app.use(express.csrf());
+  app.use(function (req, res, next) {
+    res.locals.csrftoken = req.session._csrf;
+    next();
+  });
+  app.use(stylus.middleware({
+    src: __dirname + '/public'
+  , compile: function (str, path) {
+    return stylus(str)
+      .set('filename', path).use(nib());
+  }
+  }));
+  app.use(app.router);
 });
 
 app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
+app.get('/', routes.index);
+app.post('/search', routes.search);
+app.post('/token', routes.token);
+
 server.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
-
-app.get('/', routes.index);
-app.post('/search', routes.search);
