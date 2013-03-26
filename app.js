@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -11,11 +10,6 @@ var express = require('express')
 
 var app = express();
 var server = http.createServer(app);
-var io = require('socket.io').listen(server, { log: false });
-
-fs.readdirSync('./routes').forEach(function(name) {
-  require('./routes/'+name).init(app, io);
-});
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -39,10 +33,3 @@ server.listen(app.get('port'), function(){
 
 app.get('/', routes.index);
 app.post('/search', routes.search);
-
-io.sockets.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
-  });
-});
