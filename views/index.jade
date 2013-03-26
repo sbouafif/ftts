@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1= title
+  form(method='post', action='/search', onsubmit='return false()')
+    input(name='search', id='search', placeholder='artist / song')
+  
+block script
+  script(src='/socket.io/socket.io.js')
+  script(src='js/main.js');
