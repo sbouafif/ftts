@@ -1,6 +1,7 @@
 extends layout
 
 block content
+  div(id="fb-root")
   h1= title
   form(method='post', action='/search')
     //input(type="hidden", name="_csrf", value="#{csrftoken}")

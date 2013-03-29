@@ -7,6 +7,8 @@ var express = require('express')
   , http = require('http')
   , path = require('path')
   , fs = require('fs')
+  , connect = require('connect')
+  , RedisStore = require('connect-redis')(express)
   , helmet = require('helmet')
   , stylus = require('stylus')
   , nib = require('nib');
@@ -29,14 +31,14 @@ app.configure(function(){
   app.use(helmet.cacheControl());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.static(path.join(__dirname, 'public')));
   app.use(express.session({
-    secret: "notagoodsecretnoreallydontusethisone",
-    cookie: {httpOnly: true, secure: true}
+    secret: 'foobar'
   }));
 //  app.use(express.csrf());
   app.use(function (req, res, next) {
     res.locals.csrftoken = req.session._csrf;
+    res.locals.fbToken = req.session.fbToken;
+//    res.locals.session = req.session;
     next();
   });
   app.use(stylus.middleware({
@@ -46,6 +48,7 @@ app.configure(function(){
       .set('filename', path).use(nib());
   }
   }));
+  app.use(express.static(path.join(__dirname, 'public')));
   app.use(app.router);
 });
 

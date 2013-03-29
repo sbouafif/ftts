@@ -4,6 +4,14 @@ requirejs.config({
 
 requirejs(['jquery', 'https://connect.facebook.net/en_US/all.js'], function($) {
   $(function () {
+    var delay = (function(){
+      var timer = 0;
+      return function(callback, ms){
+        clearTimeout (timer);
+        timer = setTimeout(callback, ms);
+      };
+    })();
+
     var csrf_token = '<%= '+ $('input[name="_csrf"]').val() +' %>';
     $("body").bind("ajaxSend", function(elm, xhr, s){
       if (s.type == "POST") {
@@ -11,13 +19,16 @@ requirejs(['jquery', 'https://connect.facebook.net/en_US/all.js'], function($) {
       }
     });
 
+    $('#search').focus();
+
+    if(document.cookie.loggued === undefined) {
     FB.init({ 
       appId: '501528346569865', 
       cookie: true, 
       xfbml: true, 
       status: true
     });
-    
+
     FB.getLoginStatus(function (res) {
       if (res.authResponse) {
         $.ajax({
@@ -25,11 +36,22 @@ requirejs(['jquery', 'https://connect.facebook.net/en_US/all.js'], function($) {
           url: 'token',
           data: {token: res.authResponse.accessToken}
         });
+        document.cookie = "loggued=true";
       } else {
-        console.log('fuck off');
+        FB.login(function(response) {
+          if (response.authResponse) {
+            console.log('Welcome!  Fetching your information.... ');
+            FB.api('/me', function(response) {
+              console.log('Good to see you, ' + response.name + '.');
+            });
+            window.location.reload();
+          } else {
+            console.log('fuck off');
+          }
+        });
       }
     });
-    
+    }
     var getResults = function(req) {
       $.ajax({
         type: 'POST',
@@ -56,8 +78,11 @@ requirejs(['jquery', 'https://connect.facebook.net/en_US/all.js'], function($) {
       if(e.keyCode == 13) {
         e.preventDefault();
       }
-      
-      getResults($(this).val());
+
+      var _this = $(this);
+      delay(function() {
+        getResults(_this.val());
+      }, 400);
     });
   });
 });
