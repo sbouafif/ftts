@@ -48,8 +48,6 @@ exports.token = function(req, res) {
 };
 
 exports.search = function(req, res) {
-  console.log(req.session);
-  console.log(res.locals);
 
   if(req.session.fbToken !== undefined) {
     var search = function(fttsData, s) {

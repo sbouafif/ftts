@@ -65,7 +65,7 @@ requirejs(['jquery', 'https://connect.facebook.net/en_US/all.js'], function($) {
           }
           $.each(d.data, function(i, m) {
             if(m.name !== undefined)
-              $('#res').append('<article><img src="'+m.picture+'" /><a href="'+m.link+'" title="'+m.name+'">'+m.name+'</a></br />');
+              $('#res').append('<article><a href="'+m.link+'"><img src="'+m.picture+'" /></a><a href="'+m.link+'" title="'+m.name+'">'+m.name+'</a></br />');
           });
         },
         error: function(e) {
@@ -84,5 +84,6 @@ requirejs(['jquery', 'https://connect.facebook.net/en_US/all.js'], function($) {
         getResults(_this.val());
       }, 400);
     });
+
   });
 });
